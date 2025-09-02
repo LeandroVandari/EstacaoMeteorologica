@@ -1,6 +1,5 @@
-#include <SPI.h> // Serial Peripheral Interface --> comunicação com os periferais
-#include "DHT.h"
-#include <Adafruit_BMP085.h>
+#include "DHT.h" // Sensor de temperatura e umidade
+#include <Adafruit_BMP085.h> // Sensor de temperatura e pressão
 
 DHT dht(2, DHT22);
 Adafruit_BMP085 bmp;
@@ -9,20 +8,23 @@ const int PRESSURE_PIN = A1;
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Iniciando o setup");
   dht.begin();
+  Serial.println("DHT iniciado");
   bmp.begin();
+  Serial.println("BMP iniciado);
   Serial.println("Terminei o setup");
- // SPI.begin();
- // SPI.beginTransaction(SPISettings(5000000, MSBFIRST, SPI_MODE0));
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   float hum = dht.readHumidity();
-  float temp = dht.readTemperature();
+  float temp_dht = dht.readTemperature();
+  float temp_bmp = bmp.readTemperature();
   float pressure = bmp.readPressure();
   Serial.println("Umidade: " +String(hum) + "%");
-  Serial.println("Temperatura: "+String(temp) + "°C");
+  Serial.println("Temperatura (DHT): "+String(temp_dht) + "°C");
+  Serial.println("Temperatura (BMP): "+String(temp_bmp) +"°C");
   Serial.println("Pressão: "+String(pressure) + "Pa");
 
   Serial.println("   ");
