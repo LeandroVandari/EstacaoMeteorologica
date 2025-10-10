@@ -1,10 +1,3 @@
-/**
-   httpUpdate.ino
-
-    Created on: 27.11.2015
-
-*/
-
 #include <Arduino.h>
 
 #include <ESP8266WiFi.h>
@@ -13,38 +6,45 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
-#define USE_SERIAL Serial
-
 #ifndef APSSID
-#define APSSID "Binotto"
-#define APPSK  "senhadois"
+#define APSSID "internet"
+#define APPSK "umdoistres"
 #endif
 
 ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
+  Serial.begin(9600);
+  // Serial.setDebugOutput(true);
 
-  USE_SERIAL.begin(115200);
-  // USE_SERIAL.setDebugOutput(true);
+  Serial.println();
 
-  USE_SERIAL.println();
-  USE_SERIAL.println();
-  USE_SERIAL.println();
-
-  for (uint8_t t = 4; t > 0; t--) {
-    USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
-    USE_SERIAL.flush();
-    delay(1000);
-  }
+  ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
 
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP(APSSID, APPSK);
 
+}
 
+
+void update_started() {
+  Serial.println("CALLBACK:  HTTP update process started");
+}
+
+void update_finished() {
+  Serial.println("CALLBACK:  HTTP update process finished");
+}
+
+void update_progress(int cur, int total) {
+  Serial.printf("CALLBACK:  HTTP update process at %d of %d bytes...\n", cur, total);
+}
+
+void update_error(int err) {
+  Serial.printf("CALLBACK:  HTTP update fatal error code %d\n", err);
 }
 
 void loop() {
-  // wait for WiFi connection
+  // put your main code here, to run repeatedly:
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     WiFiClient client;
@@ -57,23 +57,25 @@ void loop() {
     // value is used to put the LED on. If the LED is on with HIGH, that value should be passed
     ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://10.98.154.102:8080/tedte");
+    // Add optional callback notifiers
+    ESPhttpUpdate.onStart(update_started);
+    ESPhttpUpdate.onEnd(update_finished);
+    ESPhttpUpdate.onProgress(update_progress);
+    ESPhttpUpdate.onError(update_error);
+
+    client.connect("10.251.62.176", 8080);
+    client.print("hiiiii\n\0");
+    Serial.println("hiiii");
+    /* t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://server/file.bin");
     // Or:
-    //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
+    // t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
 
     switch (ret) {
-      case HTTP_UPDATE_FAILED:
-        USE_SERIAL.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
-        break;
+      case HTTP_UPDATE_FAILED: Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str()); break;
 
-      case HTTP_UPDATE_NO_UPDATES:
-        USE_SERIAL.println("HTTP_UPDATE_NO_UPDATES");
-        break;
+      case HTTP_UPDATE_NO_UPDATES: Serial.println("HTTP_UPDATE_NO_UPDATES"); break;
 
-      case HTTP_UPDATE_OK:
-        USE_SERIAL.println("HTTP_UPDATE_OK");
-        break;
-    }
+      case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
+    } */
   }
 }
-
