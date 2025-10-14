@@ -16,9 +16,9 @@ void setup() {
   // Serial.setDebugOutput(true);
 
 
-  String network_ssid = Serial.readString();
-  String network_pw = Serial.readString();
-  ip_servidor = Serial.readString();
+  String network_ssid = Serial.readStringUntil('\n');
+  String network_pw = Serial.readStringUntil('\n');
+  ip_servidor = Serial.readStringUntil('\n');
 
   ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
 
