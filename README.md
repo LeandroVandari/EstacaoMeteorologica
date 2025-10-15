@@ -35,3 +35,6 @@ Da esquerda para a direita:
 
 3. Para executar:
     - pinos 1234 ON, 5678 OFF
+
+
+https://www.espressif.com/sites/default/files/9b-esp8266-low_power_solutions_en_0.pdf
