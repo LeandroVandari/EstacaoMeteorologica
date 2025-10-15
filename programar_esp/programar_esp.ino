@@ -9,6 +9,8 @@
 
 ESP8266WiFiMulti WiFiMulti;
 String ip_servidor;
+String network_ssid;
+String network_pw;
 
 
 void setup() {
@@ -16,21 +18,29 @@ void setup() {
   // Serial.setDebugOutput(true);
 
 
-  String network_ssid = Serial.readStringUntil('\n');
-  String network_pw = Serial.readStringUntil('\n');
+  network_ssid = Serial.readStringUntil('\n');
+  network_pw = Serial.readStringUntil('\n');
+  network_ssid.trim();
+  network_pw.trim();
   ip_servidor = Serial.readStringUntil('\n');
-
-  ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
+  Serial.println("SSID:\"" + network_ssid+"\"");
+  Serial.println("PW:\"" + network_pw+"\"");
+  Serial.println("IP: \"" + ip_servidor+"\"");
+  Serial.println(network_ssid.c_str());
+ // ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP(network_ssid.c_str(), network_pw.c_str());
+  WiFiMulti.addAP(network_ssid.c_str(),  network_pw.c_str());
 
 }
 
 
+
 void loop() {
+  int wifi_status = WiFiMulti.run();
   // put your main code here, to run repeatedly:
-  if ((WiFiMulti.run() == WL_CONNECTED)) {
+  if ((wifi_status == WL_CONNECTED)) {
+    Serial.println("Wifi connected");
 
     WiFiClient client;
 
@@ -55,5 +65,8 @@ void loop() {
 
       case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
     } */
+  }
+  else {
+    Serial.printf("Not connected to WiFi: %d\n", wifi_status);
   }
 }
