@@ -2,16 +2,18 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
+#include <WiFiClientSecure.h>
 
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
 
 ESP8266WiFiMulti WiFiMulti;
-String ip_servidor;
 String network_ssid;
 String network_pw;
-
+const char* url = "https://script.google.com/";
+const char* path = "macros/s/AKfycbxH9zMbxy4dt8LAHt_dszYhfjA-WVSbdXxZ-V8YBTgGDfqnoSL2N_3LCbBcAvyTggjeMg/exec";
+const char* fingerprint = "10 90 B3 3F 30 77 D6 5D F3 F1 F4 8D D1 61 AA F5 9C D2 09 E6";
 
 void setup() {
   Serial.begin(9600);
@@ -22,51 +24,30 @@ void setup() {
   network_pw = Serial.readStringUntil('\n');
   network_ssid.trim();
   network_pw.trim();
-  ip_servidor = Serial.readStringUntil('\n');
-  Serial.println("SSID:\"" + network_ssid+"\"");
-  Serial.println("PW:\"" + network_pw+"\"");
-  Serial.println("IP: \"" + ip_servidor+"\"");
-  Serial.println(network_ssid.c_str());
+
  // ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP(network_ssid.c_str(),  network_pw.c_str());
-
+  WiFiMulti.addAP(network_ssid.c_str(), network_pw.c_str());
+  while (WiFiMulti.run() != WL_CONNECTED) {}
+  Serial.println("Wifi conectado!");
 }
 
 
-
 void loop() {
-  int wifi_status = WiFiMulti.run();
   // put your main code here, to run repeatedly:
-  if ((wifi_status == WL_CONNECTED)) {
-    Serial.println("Wifi connected");
+  if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    WiFiClient client;
-
-    // The line below is optional. It can be used to blink the LED on the board during flashing
-    // The LED will be on during download of one buffer of data from the network. The LED will
-    // be off during writing that buffer to flash
-    // On a good connection the LED should flash regularly. On a bad connection the LED will be
-    // on much longer than it will be off. Other pins than LED_BUILTIN may be used. The second
-    // value is used to put the LED on. If the LED is on with HIGH, that value should be passed
-    ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
-
-    client.connect(ip_servidor.c_str(), 8000);
-    client.print("hiiiii\n\0");
-    /* t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://server/file.bin");
-    // Or:
-    // t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
-
-    switch (ret) {
-      case HTTP_UPDATE_FAILED: Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str()); break;
-
-      case HTTP_UPDATE_NO_UPDATES: Serial.println("HTTP_UPDATE_NO_UPDATES"); break;
-
-      case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
+    WiFiClientSecure client;
+    HTTPClient http;
+    client.setFingerprint(fingerprint);
+   /*  for (int i = 0; i < 4; i++) {
+      Serial.parseFloat();
     } */
-  }
-  else {
-    Serial.printf("Not connected to WiFi: %d\n", wifi_status);
+    http.begin(client,url, 443, path );
+    http.GET();
+    http.addHeader("Content-Type", "application/json");
+    http.POST("{\"data\": \"oiiiiiiii\"}");
+    // --> do http.POST with the received contents;
   }
 }
