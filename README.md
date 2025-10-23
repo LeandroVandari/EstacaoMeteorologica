@@ -35,3 +35,6 @@ Da esquerda para a direita:
 
 3. Para executar:
     - pinos 1234 ON, 5678 OFF
+
+
+https://forum.arduino.cc/t/esp8266-httpclient-library-for-https/495245/3

@@ -1,18 +1,27 @@
 #include "DHT.h" // Sensor de temperatura e umidade
 #include <Adafruit_BMP085.h> // Sensor de temperatura e pressão
+#include <stdio.h>
+#include <Arduino.h>
 
 DHT dht(2, DHT22);
 Adafruit_BMP085 bmp;
 
-const int PRESSURE_PIN = A1;
-
 void setup() {
   Serial.begin(9600);
+  Serial3.begin(9600);
+  Serial3.setTimeout(100000);
+
   Serial.println("Iniciando o setup");
+
+  Serial.println("Enviando dados da rede para o ESP...");
+  Serial3.println("NOME DA REDE");
+  Serial3.println("SENHA WIFI");
+
+  Serial.println("Iniciando DHT...");
   dht.begin();
-  Serial.println("DHT iniciado");
+  Serial.println("Iniciando BMP...");
   bmp.begin();
-  Serial.println("BMP iniciado);
+
   Serial.println("Terminei o setup");
 }
 
@@ -22,6 +31,11 @@ void loop() {
   float temp_dht = dht.readTemperature();
   float temp_bmp = bmp.readTemperature();
   float pressure = bmp.readPressure();
+
+  Serial3.write([hum, temp_dht, temp_bmp, pressure], 16);
+  Serial3.flush();
+
+
   Serial.println("Umidade: " +String(hum) + "%");
   Serial.println("Temperatura (DHT): "+String(temp_dht) + "°C");
   Serial.println("Temperatura (BMP): "+String(temp_bmp) +"°C");

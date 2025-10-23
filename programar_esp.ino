@@ -8,17 +8,18 @@
 
 
 ESP8266WiFiMulti WiFiMulti;
-String ip_servidor;
-
+String network_ssid;
+String network_pw;
 
 void setup() {
   Serial.begin(9600);
   // Serial.setDebugOutput(true);
 
 
-  String network_ssid = Serial.readStringUntil('\n');
-  String network_pw = Serial.readStringUntil('\n');
-  ip_servidor = Serial.readStringUntil('\n');
+  network_ssid = Serial.readStringUntil('\n');
+  network_pw = Serial.readStringUntil('\n');
+  network_ssid.trim();
+  network_pw.trim();
 
   ESPhttpUpdate.setClientTimeout(2000);  // default was 8000
 
@@ -32,28 +33,10 @@ void loop() {
   // put your main code here, to run repeatedly:
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    WiFiClient client;
+    HttpClient http;
 
-    // The line below is optional. It can be used to blink the LED on the board during flashing
-    // The LED will be on during download of one buffer of data from the network. The LED will
-    // be off during writing that buffer to flash
-    // On a good connection the LED should flash regularly. On a bad connection the LED will be
-    // on much longer than it will be off. Other pins than LED_BUILTIN may be used. The second
-    // value is used to put the LED on. If the LED is on with HIGH, that value should be passed
-    ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
-
-    client.connect(ip_servidor.c_str(), 8000);
-    client.print("hiiiii\n\0");
-    /* t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://server/file.bin");
-    // Or:
-    // t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
-
-    switch (ret) {
-      case HTTP_UPDATE_FAILED: Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str()); break;
-
-      case HTTP_UPDATE_NO_UPDATES: Serial.println("HTTP_UPDATE_NO_UPDATES"); break;
-
-      case HTTP_UPDATE_OK: Serial.println("HTTP_UPDATE_OK"); break;
-    } */
+    http.begin("https://script.google.com/macros/s/AKfycbxH9zMbxy4dt8LAHt_dszYhfjA-WVSbdXxZ-V8YBTgGDfqnoSL2N_3LCbBcAvyTggjeMg/exec", "10 90 B3 3F 30 77 D6 5D F3 F1 F4 8D D1 61 AA F5 9C D2 09 E6");
+    http.addHeader("Content-Type", "application/json");
+    // --> do http.POST with the received contents;
   }
 }
