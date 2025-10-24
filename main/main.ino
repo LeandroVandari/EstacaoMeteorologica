@@ -6,6 +6,8 @@
 DHT dht(2, DHT22);
 Adafruit_BMP085 bmp;
 
+const int PIN_ANEMOMETRO = A6;
+
 void setup() {
   Serial.begin(9600);
   Serial3.begin(9600);
@@ -32,6 +34,7 @@ void loop() {
   float temp_dht = dht.readTemperature();
   float temp_bmp = bmp.readTemperature();
   float pressure = bmp.readPressure();
+  int vento = analogRead(A6);
   float floatarray[4] = {hum, temp_dht, temp_bmp, pressure}; 
   uint8_t send[sizeof(floatarray) *sizeof(float)];
   memcpy(send, floatarray, sizeof(floatarray));
